@@ -8,12 +8,12 @@ module.exports = express()
   .set('view engine', 'ejs')
   .set('views', 'view')
   .use(express.static('static'))
+  // Serve images
   .use('/image', express.static('db/image'))
-  // TODO: Serve the images in `db/image` on `/image`.
   .get('/', all)
+  .get('/:id', get)
   /* TODO: Other HTTP methods. */
   // .post('/', add)
-  // .get('/:id', get)
   // .put('/:id', set)
   // .patch('/:id', change)
   // .delete('/:id', remove)
@@ -30,4 +30,23 @@ function all(req, res) {
   //   json: () => res.json(result),
   //   html: () => res.render('list.ejs', Object.assign({}, result, helpers))
   // })
+}
+
+function get (request, response) {
+	var id = request.params.id
+	var result
+
+	if(!db.has(id)) {
+		result = {
+			errors: [{id: 404, title: 'Sorry we could not find this page'}],
+			data: {}
+		}
+			response.render('error.ejs', Object.assign({}, result, helpers))
+	} else {
+		result = {
+			errors: [],
+			data: db.get(id)
+		}
+		response.render('detail.ejs', Object.assign({}, result, helpers))
+	}
 }
